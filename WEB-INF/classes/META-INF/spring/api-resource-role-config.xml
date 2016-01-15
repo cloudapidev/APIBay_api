@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+
+    <!-- API Resource Role Management -->
+    <bean id="apiRoleManager" class="com.globalroam.core.security.role.ApiRoleManager">
+        <property name="apiRoles">
+            <map>
+                <entry key="commonGrp" value-ref="commonGrp"></entry>
+                <entry key="bssGrp" value-ref="bssGrp"></entry>
+                <entry key="adminGrp" value-ref="adminGrp"></entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- API Role for common -->
+    <bean id="commonGrp" class="com.globalroam.core.security.role.ApiRole">
+        <property name="accessible">
+            <list>
+                <bean class="com.globalroam.core.security.resource.impl.HttpResourceImp">
+                    <property name="resources" value="/v1/common"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- API Role for OSS/BSS -->
+    <bean id="bssGrp" class="com.globalroam.core.security.role.ApiRole">
+        <property name="accessible">
+            <list>
+                <bean class="com.globalroam.core.security.resource.impl.HttpResourceImp">
+                    <property name="resources">
+                        <list>
+                            <value>/v1/accounts</value>
+                            <value>/v1/rates</value>
+                            <value>/v1/sip_alias</value>
+                            <value>/v1/usages/purchases</value>
+                            <value>/v1/login</value>
+                            <value>/v1/reminders</value>
+                            <value>/v1/conference</value>
+                            <value>/v1/conference_party</value>
+                            <value>/v1/provider</value>
+                            <value>/v1/apideveloper</value>
+                            <value>/v1/otp</value>
+                            <value>/v1/notification</value>
+                            <value>/v1/test/mongodb</value>
+                            <value>/v1/domain</value>
+                            <value>/v1/userauth</value>
+                            <value>/v1/applications</value>
+                            <value>/v1/turn</value>
+                            <value>/v2/client_apps</value>
+                            <value>/v2/numbers</value>
+                            <value>/v2/developer_numbers</value>
+                            <value>/v2/server_apps</value>
+                            <value>/v2/sip_trunks</value>
+                            <value>/v2/sip_trunks_ips</value>
+                            <value>/v2/sip_trunks_auths</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <!-- API Role for OSS/BSS -->
+    <bean id="adminGrp" class="com.globalroam.core.security.role.ApiRole">
+        <property name="accessible">
+            <list>
+                <bean class="com.globalroam.core.security.resource.impl.HttpResourceImp">
+                    <property name="resources">
+                        <list>
+                            <value>/admin/applications</value>
+                            <value>/admin/sip_alias</value>
+                            <value>/admin/developers</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+            http://www.springframework.org/schema/data/mongo
+           http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+    <!-- 认证 支持注释的事务声明 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
+
+    <!--事务模板 -->
+    <bean id="transactionTemplate"
+          class="org.springframework.transaction.support.TransactionTemplate"
+          p:transactionManager-ref="transactionManager"
+          p:isolationLevelName="ISOLATION_REPEATABLE_READ"
+          p:propagationBehaviorName="PROPAGATION_REQUIRED"/>
+
+    <!-- 配置proxool数据源 -->
+    <!--<bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource">-->
+    <!--<property name="alias" value="${alias}"/>-->
+    <!--<property name="driver" value="${driver}"/>-->
+    <!--<property name="driverUrl" value="${driverUrl}"/>-->
+    <!--<property name="user" value="${user}"/>-->
+    <!--<property name="password" value="${password}"/>-->
+    <!--<property name="houseKeepingTestSql" value="${house-keeping-test-sql}"/>-->
+    <!--<property name="maximumConnectionCount" value="${maximum-connection-count}"/>-->
+    <!--<property name="minimumConnectionCount" value="${minimum-connection-count}"/>-->
+    <!--<property name="prototypeCount" value="${prototype-count}"/>-->
+    <!--<property name="simultaneousBuildThrottle" value="${simultaneous-build-throttle}"/>-->
+    <!--<property name="trace" value="${trace}"/>-->
+    <!--<property name="verbose" value="${verbose}"/>-->
+    <!--</bean>-->
+
+    <!-- 配置druid数据源 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="${druid.url}"/>
+        <property name="username" value="${druid.username}"/>
+        <property name="password" value="${druid.password}"/>
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${druid.initialSize}"/>
+        <property name="minIdle" value="${druid.minIdle}"/>
+        <property name="maxActive" value="${druid.maxActive}"/>
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${druid.maxWait}"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.timeBetweenEvictionRunsMillis}"/>
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${druid.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${druid.validationQuery}"/>
+        <property name="testWhileIdle" value="${druid.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${druid.testOnBorrow}"/>
+        <property name="testOnReturn" value="${druid.testOnReturn}"/>
+
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="${druid.poolPreparedStatements}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${druid.maxPoolPreparedStatementPerConnectionSize}"/>
+
+        <!-- 配置监控统计拦截的filters，去掉后监控界面sql无法统计 -->
+        <property name="filters" value="${druid.filters}"/>
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="create*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="update*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="delete*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="topUp" isolation="REPEATABLE_READ"
+                       rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="list*" isolation="READ_UNCOMMITTED"
+                       read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="retrieve*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- Multiple DataSource for LOG -->
+    <!--<bean id="dataSource_1" class="org.logicalcobwebs.proxool.ProxoolDataSource">-->
+    <!--<property name="alias" value="${db1.alias}"/>-->
+    <!--<property name="driver" value="${db1.driver}"/>-->
+    <!--<property name="driverUrl" value="${db1.driverUrl}"/>-->
+    <!--<property name="user" value="${db1.user}"/>-->
+    <!--<property name="password" value="${db1.password}"/>-->
+    <!--<property name="houseKeepingTestSql" value="${db1.house-keeping-test-sql}"/>-->
+    <!--<property name="maximumConnectionCount" value="${db1.maximum-connection-count}"/>-->
+    <!--<property name="minimumConnectionCount" value="${db1.minimum-connection-count}"/>-->
+    <!--<property name="prototypeCount" value="${db1.prototype-count}"/>-->
+    <!--<property name="simultaneousBuildThrottle" value="${db1.simultaneous-build-throttle}"/>-->
+    <!--<property name="trace" value="${db1.trace}"/>-->
+    <!--<property name="verbose" value="${db1.verbose}"/>-->
+    <!--</bean>-->
+
+    <!-- 配置druid数据源 for log-->
+    <bean id="dataSource_1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"
+          lazy-init="true">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="${druid.log.url}"/>
+        <property name="username" value="${druid.log.username}"/>
+        <property name="password" value="${druid.log.password}"/>
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${druid.log.initialSize}"/>
+        <property name="minIdle" value="${druid.log.minIdle}"/>
+        <property name="maxActive" value="${druid.log.maxActive}"/>
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${druid.log.maxWait}"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.log.timeBetweenEvictionRunsMillis}"/>
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${druid.log.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${druid.log.validationQuery}"/>
+        <property name="testWhileIdle" value="${druid.log.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${druid.log.testOnBorrow}"/>
+        <property name="testOnReturn" value="${druid.log.testOnReturn}"/>
+
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="${druid.log.poolPreparedStatements}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${druid.log.maxPoolPreparedStatementPerConnectionSize}"/>
+
+        <!-- 配置监控统计拦截的filters，去掉后监控界面sql无法统计 -->
+        <property name="filters" value="${druid.log.filters}"/>
+    </bean>
+
+
+    <!-- 配置druid数据源 for api management-->
+    <bean id="dataSource_2" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"
+          lazy-init="true">
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="${druid.apimgr.url}"/>
+        <property name="username" value="${druid.apimgr.username}"/>
+        <property name="password" value="${druid.apimgr.password}"/>
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="${druid.apimgr.initialSize}"/>
+        <property name="minIdle" value="${druid.apimgr.minIdle}"/>
+        <property name="maxActive" value="${druid.apimgr.maxActive}"/>
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${druid.apimgr.maxWait}"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.apimgr.timeBetweenEvictionRunsMillis}"/>
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${druid.apimgr.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${druid.apimgr.validationQuery}"/>
+        <property name="testWhileIdle" value="${druid.apimgr.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${druid.apimgr.testOnBorrow}"/>
+        <property name="testOnReturn" value="${druid.apimgr.testOnReturn}"/>
+
+        <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+        <property name="poolPreparedStatements" value="${druid.apimgr.poolPreparedStatements}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize"
+                  value="${druid.apimgr.maxPoolPreparedStatementPerConnectionSize}"/>
+
+        <!-- 配置监控统计拦截的filters，去掉后监控界面sql无法统计 -->
+        <property name="filters" value="${druid.apimgr.filters}"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager_2"/>
+
+    <bean id="transactionManager_2"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource_2"/>
+
+
+    <!-- mongo db for log system-->
+    <mongo:db-factory id="mongoDbFactory" host="${db3.host}" port="${db3.port}"
+                      dbname="${db3.dbname}" username="${db3.username}" password="${db3.password}"/>
+</beans>

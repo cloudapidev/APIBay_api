@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.1.xsd
+
+
+           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd">
+    <!-- Load properties files -->
+    <context:property-placeholder
+            location="classpath:jdbc.properties,classpath:mail.properties"/>
+
+    <!-- Enable annotation on these packages -->
+    <context:component-scan
+            base-package="com.globalroam.api,com.globalroam.core" />
+
+    <!-- Enable task support -->
+    <task:annotation-driven/>
+
+    <import resource="api-adaptor-config.xml"/>
+    <import resource="api-security-config.xml"/>
+    <import resource="api-resource-role-config.xml"/>
+    <import resource="app-component.xml"/>
+    <!-- zhenzhong add new config file -->
+    <import resource="spring-mvc-config.xml"/>
+    <import resource="spring-aop-config.xml"/>
+    <import resource="spring-service-config.xml"/>
+    <import resource="spring-database-config.xml"/>
+    <import resource="spring-mybatis-config.xml"/>
+    <import resource="spring-mango-config.xml"/>
+    <!-- import resource="spring-quartz-config.xml" /-->
+
+    <!--<bean id="appContextProvider" class="common.context.AppContextProvider"/>-->
+
+    <!-- *******************************Cloud engine configuration [END]************************************* -->
+
+    <!-- 是否支持老版本开关 -->
+    <bean id="SupportOldVersion" class="java.lang.String">
+        <constructor-arg type="java.lang.String" value="UNSUPPORT"/>
+    </bean>
+
+</beans>

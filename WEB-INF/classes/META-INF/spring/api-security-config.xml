@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+
+
+    <bean id="authenticator" class="com.globalroam.core.security.authentication.ApiKeyAuthenticator">
+        <property name="reqTimeoutSeconds" value="86400"></property>
+        <property name="maxMinusSeconds" value="-600"></property>
+    </bean>
+    <bean id="authenticator2" class="com.globalroam.core.security.authentication.DefaultAuthenticator">
+        <property name="filter">
+            <bean class="com.globalroam.core.security.filter.impl.IpFilter">
+                <property name="allows">
+                    <list>
+                        <value>public</value>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="apiUserManager" class="com.globalroam.core.security.user.ApiUserManager"/>
+
+    <!-- API USER: United API user for GNum declare start(temporarily solution) -->
+    <!-- resource roles configuration -->
+    <util:list id="ResourceRoles" list-class="java.util.ArrayList"
+               value-type="java.lang.String">
+        <value>bssGrp</value>
+        <value>adminGrp</value>
+    </util:list>
+    <bean id="defaultProviderId" class="java.lang.String"> <!-- GR default value： GLOBALROAM -->
+        <constructor-arg type="java.lang.String" value="GLOBALROAM"/>
+    </bean>
+
+</beans>

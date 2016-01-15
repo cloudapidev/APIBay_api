@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+  <classPathEntry location="E:\\Fanc-work\\project\\tela_mobileapi\\RestCoreApi\\src\\main\\resources\\ojdbc6-11.2.0.3.jar" />
+
+  <context id="OracleTables" targetRuntime="MyBatis3">
+    <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver"
+        connectionURL="jdbc:oracle:thin:CLOUDAPI_BSS/cloudapi_bss_14@10.0.1.103:1521:grs"
+        userId="CLOUDAPI_BSS"
+        password="cloudapi_bss_14">
+    </jdbcConnection>
+
+    <javaTypeResolver >
+      <property name="forceBigDecimals" value="false" />
+    </javaTypeResolver>
+
+    <javaModelGenerator targetPackage="com.globalroam.entity" targetProject="src\main\java">
+      <property name="enableSubPackages" value="true" />
+      <property name="trimStrings" value="true" />
+    </javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="com.globalroam.dao"  targetProject="src\main\java">
+      <property name="enableSubPackages" value="true" />
+    </sqlMapGenerator>
+
+    <javaClientGenerator type="XMLMAPPER" targetPackage="modelMap"  targetProject="src\main\resources">
+      <property name="enableSubPackages" value="true" />
+    </javaClientGenerator>
+
+    <table schema="CLOUDAPI_BSS" tableName="%" >
+      <generatedKey column="ID" sqlStatement="Oracle" identity="true" />
+    </table>
+
+  </context>
+</generatorConfiguration>

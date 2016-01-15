@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+    <!-- 认证 支持注释的事务声明 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
+
+    <!--事务模板 -->
+    <!--<bean id="transactionTemplate"-->
+    <!--class="org.springframework.transaction.support.TransactionTemplate"-->
+    <!--p:transactionManager-ref="transactionManager"-->
+    <!--p:isolationLevelName="ISOLATION_REPEATABLE_READ"-->
+    <!--p:propagationBehaviorName="PROPAGATION_REQUIRED"/>-->
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="create*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="update*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="delete*" rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="topUp" isolation="REPEATABLE_READ"
+                       rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="list*" isolation="READ_UNCOMMITTED"
+                       read-only="true"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="retrieve*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+
+    <!-- 配置proxool数据源 -->
+    <bean id="dataSource" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+        <property name="alias" value="${alias}"/>
+        <property name="driver" value="${driver}"/>
+        <property name="driverUrl" value="${driverUrl}"/>
+        <property name="user" value="${user}"/>
+        <property name="password" value="${password}"/>
+        <property name="houseKeepingTestSql" value="${house-keeping-test-sql}"/>
+        <property name="maximumConnectionCount" value="${maximum-connection-count}"/>
+        <property name="minimumConnectionCount" value="${minimum-connection-count}"/>
+        <property name="maximumConnectionLifetime" value="${maximum-connection-lifetime}"/>
+        <property name="prototypeCount" value="${prototype-count}"/>
+        <property name="simultaneousBuildThrottle" value="${simultaneous-build-throttle}"/>
+        <property name="trace" value="${trace}"/>
+        <property name="verbose" value="${verbose}"/>
+    </bean>
+
+    <!-- Multiple DataSource for LOG -->
+    <bean id="dataSource_1" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+        <property name="alias" value="${db1.alias}"/>
+        <property name="driver" value="${db1.driver}"/>
+        <property name="driverUrl" value="${db1.driverUrl}"/>
+        <property name="user" value="${db1.user}"/>
+        <property name="password" value="${db1.password}"/>
+        <property name="houseKeepingTestSql" value="${db1.house-keeping-test-sql}"/>
+        <property name="maximumConnectionCount" value="${db1.maximum-connection-count}"/>
+        <property name="minimumConnectionCount" value="${db1.minimum-connection-count}"/>
+        <property name="maximumConnectionLifetime" value="${db1.maximum-connection-lifetime}"/>
+        <property name="prototypeCount" value="${db1.prototype-count}"/>
+        <property name="simultaneousBuildThrottle" value="${db1.simultaneous-build-throttle}"/>
+        <property name="trace" value="${db1.trace}"/>
+        <property name="verbose" value="${db1.verbose}"/>
+    </bean>
+
+    <!-- Multiple DataSource for Api management -->
+    <bean id="dataSource_2" class="org.logicalcobwebs.proxool.ProxoolDataSource">
+        <property name="alias" value="${db2.alias}"/>
+        <property name="driver" value="${db2.driver}"/>
+        <property name="driverUrl" value="${db2.driverUrl}"/>
+        <property name="user" value="${db1.user}"/>
+        <property name="password" value="${db2.password}"/>
+        <property name="houseKeepingTestSql" value="${db2.house-keeping-test-sql}"/>
+        <property name="maximumConnectionCount" value="${db2.maximum-connection-count}"/>
+        <property name="minimumConnectionCount" value="${db2.minimum-connection-count}"/>
+        <property name="maximumConnectionLifetime" value="${db2.maximum-connection-lifetime}"/>
+        <property name="prototypeCount" value="${db2.prototype-count}"/>
+        <property name="simultaneousBuildThrottle" value="${db2.simultaneous-build-throttle}"/>
+        <property name="trace" value="${db2.trace}"/>
+        <property name="verbose" value="${db2.verbose}"/>
+    </bean>
+
+
+    <!--<tx:annotation-driven transaction-manager="transactionManager_2"/>-->
+
+    <!--<bean id="transactionManager_2"-->
+    <!--class="org.springframework.jdbc.datasource.DataSourceTransactionManager"-->
+    <!--p:dataSource-ref="dataSource_2"/>-->
+
+
+    <!-- mongo db for log system-->
+    <!--<mongo:db-factory id="mongoDbFactory" host="${db3.host}" port="${db3.port}"-->
+    <!--dbname="${db3.dbname}" username="${db3.username}" password="${db3.password}"/>-->
+</beans>

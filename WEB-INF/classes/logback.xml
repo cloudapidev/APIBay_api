@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<!-- To enable JMX Management -->
+	<jmxConfigurator />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%.-1level|%-40.40logger{0}|%msg%n</pattern>
+		</encoder>
+	</appender>
+
+    <logger name="com.globalroam" level="debug" />
+	<logger name="com.globalroam.api.controller" level="debug" />
+	<logger name="com.globalroam.api.service" level="debug" />
+	<logger name="com.globalroam.service" level="debug" />
+	<logger name="com.globalroam.core" level="debug" />
+
+	 <logger name="org.springframework" level="WARN"/>
+	 <logger name="org.logicalcobwebs" level="WARN"/>
+	<logger name="java.sql.Connection" level="DEBUG" />    
+	<logger name="java.sql.Statement" level="DEBUG" />    
+	<logger name="java.sql.PreparedStatement" level="DEBUG" />       
+
+	<root level="info">
+		<appender-ref ref="console" />
+	</root>
+</configuration>

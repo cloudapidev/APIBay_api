@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+    <!-- API rate limiting configuration -->
+    <bean id="limitService"
+          class="com.globalroam.core.security.tier.service.impl.ApiRateLimitServiceImp" init-method="configure">
+        <property name="apiId" value="10"/>
+        <property name="limitCacheName" value="api-limit-cache"/>
+        <property name="protocol" value="HTTP"/>
+        <property name="enabled" value="true"/>
+        <property name="timeToLive" value="10"/>
+        <property name="maxAllowed" value="1000"/>
+        <property name="cacheSize" value="10240"/>
+        <property name="limitStore" ref="ehLimitStore"/>
+    </bean>
+
+    <!-- Ehcache limit store -->
+    <bean id="ehLimitStore" class="com.globalroam.core.security.tier.EhcacheLimitStore"/>
+
+    <!-- limit store entry >
+    <bean id="storeEntry" class="com.globalroam.security.ratelimit.StoreEntryImp" /-->
+</beans>

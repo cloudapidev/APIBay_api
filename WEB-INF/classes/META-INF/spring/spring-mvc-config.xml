@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
+
+
+    <!-- [START] Configures the @Controller programming model -->
+    <mvc:annotation-driven
+            content-negotiation-manager="contentNegotiationManager"
+            enable-matrix-variables="true">
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="jacksonObjectMapper"/>
+            </bean>
+            <bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+                <property name="objectMapper" ref="xmlObjectMapper"/>
+            </bean>
+        </mvc:message-converters>
+        <mvc:path-matching></mvc:path-matching>
+    </mvc:annotation-driven>
+
+
+    <bean id="contentNegotiationManager"
+          class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="true"/>
+        <property name="favorParameter" value="false"/>
+        <property name="parameterName" value="mediaType"/>
+        <property name="ignoreAcceptHeader" value="true"/>
+        <property name="useJaf" value="false"/>
+        <property name="defaultContentType" value="application/json"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="html" value="text/html;charset=utf-8"/>
+                <entry key="json" value="application/json;charset=utf-8"/>
+                <entry key="xml" value="application/xml;charset=utf-8"/>
+            </map>
+        </property>
+    </bean>
+
+
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+        <property name="order" value="1"/>
+        <property name="contentNegotiationManager" ref="contentNegotiationManager"/>
+        <property name="viewResolvers">
+            <list>
+                <ref bean="viewResolver"/>
+            </list>
+        </property>
+        <!--<property name="defaultViews">-->
+        <!--<list>-->
+        <!--<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>-->
+        <!--</list>-->
+        <!--</property>-->
+    </bean>
+
+
+    <!-- Controller and interceptor mapping for API authentication -->
+    <mvc:interceptors>
+        <!-- Internationalisation interceptor -->
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"/>
+        <mvc:interceptor>
+            <mvc:mapping path="/v1/**"/>
+            <mvc:exclude-mapping path="/api-docs/**"/>
+            <mvc:exclude-mapping path="/swagger/**"/>
+            <mvc:exclude-mapping path="/authFail/**"/>
+            <ref bean="defaultMappingInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/v2/**"/>
+            <mvc:exclude-mapping path="/api-docs/**"/>
+            <mvc:exclude-mapping path="/swagger/**"/>
+            <mvc:exclude-mapping path="/authFail/**"/>
+            <ref bean="defaultMappingInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/admin/**"/>
+            <mvc:exclude-mapping path="/api-docs/**"/>
+            <mvc:exclude-mapping path="/swagger/**"/>
+            <mvc:exclude-mapping path="/authFail/**"/>
+            <ref bean="defaultMappingInterceptor2"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <bean id="defaultMappingInterceptor"
+          class="com.globalroam.core.interceptor.DefaultMappingAdaptorInterceptor">
+        <property name="authenticator" ref="authenticator"/>
+        <property name="requestToMap" value="false"/>
+    </bean>
+    <bean id="defaultMappingInterceptor2"
+          class="com.globalroam.core.interceptor.DefaultMappingAdaptorInterceptor">
+        <property name="authenticator" ref="authenticator2"/>
+        <property name="requestToMap" value="false"/>
+    </bean>
+    <!-- [END] Configures the @Controller programming model -->
+
+    <!-- Saves a locale change using a cookie ,default is org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver -->
+    <bean id="localeResolver"
+          class="org.springframework.web.servlet.i18n.CookieLocaleResolver"/>
+    <bean id="messageSource"
+          class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="messages"/>
+        <property name="useCodeAsDefaultMessage" value="true"/>
+    </bean>
+
+
+    <!-- api authorization authentication fail view -->
+    <mvc:redirect-view-controller path="/" redirect-url="/swagger/index.html"/>
+    <mvc:default-servlet-handler/>
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    <!-- multipart resolver conf -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="100000"/>
+    </bean>
+
+    <!--定义Exception Resolver -->
+    <bean id="exceptionResolver"
+          class="com.grapi.common.exception.resolver.CustomMappingExceptionResolver">
+        <property name="errorsBaseUri" value="https://api.gnum.com/v1/errors/"/>
+        <property name="viewName" value="error"/>
+    </bean>
+
+    <!-- <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+        </bean> -->
+
+
+    <!--</bean>-->
+
+    <!-- end -->
+
+    <!-- 对静态资源文件的访问 -->
+    <mvc:resources location="/WEB-INF/swagger/" mapping="/swagger/**"/>
+</beans>
